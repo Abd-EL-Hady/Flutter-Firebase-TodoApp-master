@@ -31,52 +31,71 @@ class _TodoListState extends State<TodoList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('To-Do List')),
+      appBar: AppBar(
+        title: const Text(
+          'To-Do List',
+          style: TextStyle(fontSize: 40),
+        ),
+        backgroundColor: Colors.red,
+        centerTitle: true,
+        toolbarHeight: 100,
+        shape: ContinuousRectangleBorder(
+            borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30))),
+      ),
       body: ListView(children: _getItems()),
       floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.red,
           onPressed: () => _displayDialog(context),
           tooltip: 'Add Item',
-          child: const Icon(Icons.add)),
+          child: const Icon(
+            Icons.add,
+            color: Colors.white,
+          )),
     );
   }
 
   void _addTodoItem(String title) {
-    // Wrapping it inside a set state will notify
-    // the app that the state has changed
     setState(() {
       _todoList.add(title);
     });
     _textFieldController.clear();
   }
 
-  // this Generate list of item widgets
   Widget _buildTodoItem(String title) {
     return ListTile(title: Text(title));
   }
 
-  // display a dialog for the user to enter items
   Future<Future> _displayDialog(BuildContext context) async {
-    // alter the app state to show a dialog
     return showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Add a task to your list'),
+            title: const Text(
+              'Add a task to do',
+              style: TextStyle(color: Colors.red),
+            ),
             content: TextField(
               controller: _textFieldController,
-              decoration: const InputDecoration(hintText: 'Enter task here'),
+              decoration: const InputDecoration(
+                hintText: 'Enter task here',
+              ),
             ),
             actions: [
-              // add button
               ElevatedButton(
-                child: const Text('ADD'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _addTodoItem(_textFieldController.text);
-                },
-              ),
-              // Cancel button
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.red),
+                  ),
+                  child: const Text('ADD'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _addTodoItem(_textFieldController.text);
+                  }),
               ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.red),
+                ),
                 child: const Text('CANCEL'),
                 onPressed: () {
                   Navigator.of(context).pop();
