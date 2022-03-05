@@ -2,12 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(Todo());
-}
-
 class Todo extends StatelessWidget {
   const Todo({Key key}) : super(key: key);
 
@@ -44,7 +38,29 @@ class _TodoListState extends State<TodoList> {
                 bottomLeft: Radius.circular(30),
                 bottomRight: Radius.circular(30))),
       ),
-      body: ListView(children: _getItems()),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('users').snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return Text('Something went wrong');
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Text("Loading");
+          }
+
+          return ListView(
+            children: snapshot.data.docs.map((DocumentSnapshot document) {
+              Map<String, dynamic> data =
+                  document.data() as Map<String, dynamic>;
+              return ListTile(
+                title: Text(data['task']),
+                subtitle: Text(data['isDone'].toString()),
+              );
+            }).toList(),
+          );
+        },
+      ),
       floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.red,
           onPressed: () => _displayDialog(context),
@@ -79,8 +95,9 @@ class _TodoListState extends State<TodoList> {
             content: TextField(
               controller: _textFieldController,
               decoration: const InputDecoration(
-                hintText: 'Enter task here',
-              ),
+                  hintText: 'Enter task here',
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red))),
             ),
             actions: [
               ElevatedButton(
@@ -130,19 +147,17 @@ class _AddUserState extends State<AddUser> {
   @override
   Widget build(BuildContext context) {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
-
-    Future<void> addUser() {
+    Stream collectionStream =
+        FirebaseFirestore.instance.collection('users').snapshots();
+    Future<void> addTask() {
       return users
-          .add({
-            '_todoList': widget._todoList,
-            '_textFieldController': widget._textFieldController,
-          })
+          .add({})
           .then((value) => print("User Added"))
           .catchError((error) => print("Failed to add user: $error"));
     }
 
     return TextButton(
-      onPressed: addUser,
+      onPressed: addTask,
       child: Text(
         "Add User",
       ),
