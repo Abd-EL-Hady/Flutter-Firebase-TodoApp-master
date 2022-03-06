@@ -149,11 +149,8 @@ class _AddUserState extends State<AddUser> {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     Stream collectionStream =
         FirebaseFirestore.instance.collection('users').snapshots();
-    Future<void> addTask() {
-      return users
-          .add({})
-          .then((value) => print("User Added"))
-          .catchError((error) => print("Failed to add user: $error"));
+    Future<void> addTask() async {
+       users.doc(task1).set(add({}));
     }
 
     return TextButton(
