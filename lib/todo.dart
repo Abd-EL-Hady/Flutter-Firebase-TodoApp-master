@@ -144,13 +144,25 @@ class AddUser extends StatefulWidget {
 }
 
 class _AddUserState extends State<AddUser> {
+  get task => null;
+
+  get isDone => null;
+
   @override
   Widget build(BuildContext context) {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     Stream collectionStream =
         FirebaseFirestore.instance.collection('users').snapshots();
     Future<void> addTask() async {
-       users.doc(task1).set(add({}));
+       FirebaseFirestore.instance.collection('users').doc().update({
+         'task':task,
+         'isDone':isDone.toString() 
+         
+
+       }).then((_){
+         print('success');
+         });
+
     }
 
     return TextButton(
